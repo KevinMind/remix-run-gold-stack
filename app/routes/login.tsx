@@ -6,11 +6,11 @@ export async function loader({ request }: LoaderArgs) {
   const method = new URL(request.url).searchParams.get("method") || "auth0";
 
   if (!["auth0", "auth0-magic"].includes(method)) {
-    return redirect('/login');
+    return redirect("/login");
   }
 
   await authenticator.isAuthenticated(request, {
-    successRedirect: '/',
+    successRedirect: "/",
   });
 
   return authenticator.authenticate(method, request);

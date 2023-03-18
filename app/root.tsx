@@ -26,7 +26,7 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-export async function loader({request}: LoaderArgs) {
+export async function loader({ request }: LoaderArgs) {
   return json({
     env,
     user: await authenticator.isAuthenticated(request),
@@ -47,6 +47,7 @@ export default function App() {
       <body className="h-full">
         <Progress />
         <Outlet />
+        <div>{isUser ? <p>User</p> : <p>No user</p>}</div>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

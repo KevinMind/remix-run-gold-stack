@@ -5,10 +5,9 @@ import { authenticator } from "~/auth.server";
 
 export async function loader({ request }: LoaderArgs) {
   return authenticator.isAuthenticated(request, {
-    successRedirect: '/',
+    successRedirect: "/",
   });
 }
-
 
 export const meta: MetaFunction = () => {
   return {
@@ -17,9 +16,8 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Join() {
-
   return (
-    <div className="flex min-h-full flex-col justify-center z-10">
+    <div className="z-10 flex min-h-full flex-col justify-center">
       <Form action="/auth/auth0?screen_hint=signup" method="post">
         <button>Register with Auth0</button>
       </Form>

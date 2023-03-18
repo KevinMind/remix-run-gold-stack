@@ -1,9 +1,13 @@
 import { Authenticator } from "remix-auth";
-import type { Auth0ExtraParams, Auth0Profile, Auth0StrategyOptions } from "remix-auth-auth0";
+import type {
+  Auth0ExtraParams,
+  Auth0Profile,
+  Auth0StrategyOptions,
+} from "remix-auth-auth0";
 import { Auth0Strategy } from "remix-auth-auth0";
 import { sessionStorage } from "~/session.server";
-import type { User} from '~/models/user.server';
-import {createUser, getUserByEmail} from '~/models/user.server';
+import type { User } from "~/models/user.server";
+import { createUser, getUserByEmail } from "~/models/user.server";
 import { env } from "./env.server";
 
 export let authenticator = new Authenticator<User>(sessionStorage);
@@ -15,17 +19,28 @@ interface CallbackArgs {
   refreshToken: string;
 }
 
-async function callbackLogin({ accessToken, refreshToken, extraParams, profile }: CallbackArgs) {
-  console.log(JSON.stringify({
-    accessToken,
-    refreshToken,
-    extraParams,
-    profile
-  }, null, 2));
+async function callbackLogin({
+  accessToken,
+  refreshToken,
+  extraParams,
+  profile,
+}: CallbackArgs) {
+  console.log(
+    JSON.stringify(
+      {
+        accessToken,
+        refreshToken,
+        extraParams,
+        profile,
+      },
+      null,
+      2
+    )
+  );
 
   const email = profile?.emails?.[0].value;
 
-  if (!email) throw new Error('must provide email');
+  if (!email) throw new Error("must provide email");
 
   const existingUser = await getUserByEmail(email);
 
@@ -52,18 +67,18 @@ authenticator.use(
     {
       ...defaultParams,
     },
-    callbackLogin,
+    callbackLogin
   ),
   "auth0"
-)
+);
 
 authenticator.use(
   new Auth0Strategy(
     {
       ...defaultParams,
-      connection: 'email',
+      connection: "email",
     },
-    callbackLogin,
+    callbackLogin
   ),
   "auth0-magic"
-)
+);
