@@ -10,7 +10,61 @@ import type { User } from "~/models/user.server";
 import { createUser, getUserByEmail } from "~/models/user.server";
 import { env } from "./env.server";
 
-export let authenticator = new Authenticator<User>(sessionStorage);
+let authenticator = new Authenticator<User>(sessionStorage);
+
+const HOME_PATH = "/";
+const LOGIN_PATH = "/login";
+
+export enum AuthMethods {
+  Standard = "auth0",
+}
+
+export async function logout(
+  request: Request,
+  options: Parameters<typeof authenticator.logout>[1] = {
+    redirectTo: HOME_PATH,
+  }
+) {
+  return authenticator.logout(request, options);
+}
+
+export async function requireUser(
+  request: Request,
+  options: Parameters<typeof authenticator.isAuthenticated>[1] = {
+    successRedirect: HOME_PATH,
+    failureRedirect: LOGIN_PATH,
+  }
+) {
+  await authenticator.isAuthenticated(request, options);
+}
+
+export async function optionalUser(request: Request) {
+  return authenticator.isAuthenticated(request);
+}
+
+export function authenticateRequest(
+  request: Request,
+  method: AuthMethods,
+  options: Parameters<typeof authenticator.authenticate>[2] = {
+    successRedirect: HOME_PATH,
+  }
+) {
+  return authenticator.authenticate(method, request, options);
+}
+
+export function getAuthMethod(request: Request): AuthMethods {
+  const method = new URL(request.url).searchParams.get("authMethod");
+
+  if (method) {
+    const validMethods = Object.values(AuthMethods);
+
+    if (validMethods.includes(method as AuthMethods)) {
+      return method as AuthMethods;
+    }
+  }
+
+  return AuthMethods.Standard;
+}
 
 interface CallbackArgs {
   profile: Auth0Profile;
@@ -62,23 +116,21 @@ const defaultParams: Auth0StrategyOptions = {
   domain: env.AUTH_ZERO_DOMAIN,
 };
 
-authenticator.use(
-  new Auth0Strategy(
-    {
-      ...defaultParams,
-    },
-    callbackLogin
-  ),
-  "auth0"
-);
+type Method = {
+  [key in AuthMethods]: Auth0StrategyOptions;
+};
 
-authenticator.use(
-  new Auth0Strategy(
-    {
-      ...defaultParams,
-      connection: "email",
-    },
-    callbackLogin
-  ),
-  "auth0-magic"
-);
+const authenticationMethods: Method = {
+  [AuthMethods.Standard]: defaultParams,
+  // add more auth methods below
+  /*
+  [AuthMethods.CustomStrategy]: {...defaultParams, connection: ''}
+  */
+};
+
+for (let [authMethod, options] of Object.entries(authenticationMethods)) {
+  authenticator.use(
+    new Auth0Strategy<User>(options, callbackLogin),
+    authMethod
+  );
+}

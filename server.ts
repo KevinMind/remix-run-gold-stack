@@ -5,6 +5,8 @@ import morgan from "morgan";
 import { createRequestHandler } from "@remix-run/express";
 import prom from "@isaacs/express-prometheus-middleware";
 
+import { env, isProduction } from "~/env.server";
+
 const app = express();
 const metricsApp = express();
 app.use(
@@ -74,35 +76,30 @@ app.use(express.static("public", { maxAge: "1h" }));
 
 app.use(morgan("tiny"));
 
-const MODE = process.env.NODE_ENV;
 const BUILD_DIR = path.join(process.cwd(), "build");
 
 app.all(
   "*",
-  MODE === "production"
+  isProduction
     ? createRequestHandler({ build: require(BUILD_DIR) })
     : (...args) => {
         purgeRequireCache();
         const requestHandler = createRequestHandler({
           build: require(BUILD_DIR),
-          mode: MODE,
+          mode: env.NODE_ENV,
         });
         return requestHandler(...args);
       }
 );
 
-const port = process.env.PORT || 3000;
-
-app.listen(port, () => {
+app.listen(env.PORT, () => {
   // require the built app so we're ready when the first request comes in
   require(BUILD_DIR);
-  console.log(`✅ app ready: http://localhost:${port}`);
+  console.log(`✅ app ready: http://localhost:${env.PORT}`);
 });
 
-const metricsPort = process.env.METRICS_PORT || 3001;
-
-metricsApp.listen(metricsPort, () => {
-  console.log(`✅ metrics ready: http://localhost:${metricsPort}/metrics`);
+metricsApp.listen(env.METRICS_PORT, () => {
+  console.log(`✅ metrics ready: http://localhost:${env.METRICS_PORT}/metrics`);
 });
 
 function purgeRequireCache() {

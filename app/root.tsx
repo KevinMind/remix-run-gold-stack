@@ -11,7 +11,7 @@ import {
   useLoaderData,
 } from "@remix-run/react";
 import { env } from "~/env.server";
-import { authenticator } from "./auth.server";
+import { optionalUser } from "./auth.server";
 import { Progress } from "./components/Progress";
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
@@ -29,7 +29,7 @@ export const meta: MetaFunction = () => ({
 export async function loader({ request }: LoaderArgs) {
   return json({
     env,
-    user: await authenticator.isAuthenticated(request),
+    user: await optionalUser(request),
   });
 }
 

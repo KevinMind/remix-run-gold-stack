@@ -1,9 +1,10 @@
 import type { LoaderArgs } from "@remix-run/node";
 
-import { authenticator } from "~/auth.server";
+import { authenticateRequest, getAuthMethod } from "~/auth.server";
 
 export let loader = ({ request }: LoaderArgs) => {
-  return authenticator.authenticate("auth0", request, {
+  const method = getAuthMethod(request);
+  return authenticateRequest(request, method, {
     successRedirect: "/",
     failureRedirect: "/login",
   });

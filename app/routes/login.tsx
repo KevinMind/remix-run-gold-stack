@@ -1,19 +1,21 @@
 import type { LoaderArgs, MetaFunction } from "@remix-run/node";
-import { redirect } from "react-router";
-import { authenticator } from "~/auth.server";
+import {
+  authenticateRequest,
+  getAuthMethod,
+  optionalUser,
+} from "~/auth.server";
 
 export async function loader({ request }: LoaderArgs) {
-  const method = new URL(request.url).searchParams.get("method") || "auth0";
+  const method = getAuthMethod(request);
 
-  if (!["auth0", "auth0-magic"].includes(method)) {
-    return redirect("/login");
-  }
-
-  await authenticator.isAuthenticated(request, {
-    successRedirect: "/",
+  console.log({
+    raw: new URL(request.url).searchParams.get("method"),
+    method,
   });
 
-  return authenticator.authenticate(method, request);
+  await optionalUser(request);
+
+  return authenticateRequest(request, method);
 }
 
 export const meta: MetaFunction = () => {
