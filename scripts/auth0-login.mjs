@@ -3,8 +3,6 @@
 import { $ } from 'zx';
 import { setEnv } from './utils.mjs';
 
-// $.verbose = false;
-
 function parseDeviceConfirmationCode(input) {
     const urlMatch = input.match(/Open the following URL in a browser: (\S+)/);
 

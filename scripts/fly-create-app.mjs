@@ -24,14 +24,28 @@ const foundApp = existingApps.some((app) => app.ID === appName);
 
 if (foundApp) {
     log(`found app: ${appName} in fly no need to create`);
-    process.exit(0);
+} else {
+    log(`creating app: ${appName}`);
+    $.verbose = true;
+    await $`fly apps create ${appName}`;
+    await $`fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app ${appName}`;
 }
-
-await $`fly apps create ${appName}`;
-
-await $`fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app ${appName}`;
 
 const dbName = `${appName}-db`;
 
-await $`fly postgres create --name ${dbName}`;
-await $`fly postgres attach --app ${appName} ${dbName}`;
+const foundDb = existingApps.some((app) => app.ID === dbName);
+
+if (foundDb) {
+    log(`found db: ${dbName}`);
+} else {
+    $.verbose = true;
+    const region = 'ams';
+    const volumeSize = 1;
+    const initialClusterSize = 1;
+    const vmSize = 'shared-cpu-1x';
+
+    log(`creating database ${dbName} for ${appName}`);
+    await $`fly postgres create --name ${dbName} --region ${region} --volume-size ${volumeSize} --initial-cluster-size ${initialClusterSize} --vm-size ${vmSize} `;
+    await $`fly postgres attach --app ${appName} ${dbName}`;
+}
+
