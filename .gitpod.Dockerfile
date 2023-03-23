@@ -9,5 +9,6 @@ ENV PATH="$FLYCTL_INSTALL/bin:$PATH"
 RUN brew install gh
 
 # Install Auth0 CLI
-RUN curl -sSfL https://raw.githubusercontent.com/auth0/auth0-cli/main/install.sh | sh -s -- -b .
-RUN sudo mv ./auth0 /usr/local/bin
+RUN brew tap auth0/auth0-cli && brew install auth0
+
+
