@@ -45,6 +45,7 @@ tasks:
     command: |
       gp await-port 5432
       npm run script ./scripts/auth0-login.mjs
+      npm run script ./scripts/fly-login.mjs
       npm run setup
       npm run build
       npm run dev
