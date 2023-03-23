@@ -67,11 +67,11 @@ Click this button to create a [Gitpod](https://gitpod.io) workspace with the pro
 
 This starts your app in development mode, rebuilding assets on file changes.
 
+If you'd prefer not to use Docker, you can also use Fly's Wireguard VPN to connect to a development database (or even your production database). You can find the instructions to set up Wireguard [here](https://fly.io/docs/reference/private-networking/#install-your-wireguard-app), and the instructions for creating a development database [here](https://fly.io/docs/reference/postgres/).
+
 ### Setup auth0
 
 Go to auth0, create an account if you have not and follow these [instructions](https://auth0.com/docs/quickstart/webapp/express/interactive) to get your app credentials
-
-If you'd prefer not to use Docker, you can also use Fly's Wireguard VPN to connect to a development database (or even your production database). You can find the instructions to set up Wireguard [here](https://fly.io/docs/reference/private-networking/#install-your-wireguard-app), and the instructions for creating a development database [here](https://fly.io/docs/reference/postgres/).
 
 ### Relevant code:
 

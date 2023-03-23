@@ -8,7 +8,7 @@ import { Auth0Strategy } from "remix-auth-auth0";
 import { sessionStorage } from "~/session.server";
 import type { User } from "~/models/user.server";
 import { createUser, getUserByEmail } from "~/models/user.server";
-import { env } from "./env.server";
+import { env, isProduction} from "./env.server";
 
 let authenticator = new Authenticator<User>(sessionStorage);
 
@@ -109,7 +109,7 @@ async function callbackLogin({
   });
 }
 
-const defaultParams: Auth0StrategyOptions = {
+export const defaultParams: Auth0StrategyOptions = {
   callbackURL: env.AUTH_ZERO_CALLBACK_URL,
   clientID: env.AUTH_ZERO_CLIENT_ID,
   clientSecret: env.AUTH_ZERO_CLIENT_SECRET,

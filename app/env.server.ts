@@ -19,9 +19,14 @@ const envSchema = z.object({
   AUTH_ZERO_CLIENT_ID: z.string().trim().min(1),
   AUTH_ZERO_CLIENT_SECRET: z.string().trim().min(1),
   AUTH_ZERO_CALLBACK_URL: z.string().trim().min(1),
-  PORT: z.number().catch(3000),
-  METRICS_PORT: z.number().catch(3001),
+  PORT: z.number(),
+  METRICS_PORT: z.number(),
   NODE_ENV: NodeEnv.catch("development"),
+});
+
+console.log({
+  PORT,
+  METRICS_PORT,
 });
 
 export const env = envSchema.parse({
@@ -30,8 +35,8 @@ export const env = envSchema.parse({
   AUTH_ZERO_CLIENT_ID,
   AUTH_ZERO_CLIENT_SECRET,
   AUTH_ZERO_CALLBACK_URL,
-  PORT,
-  METRICS_PORT,
+  PORT: Number(PORT),
+  METRICS_PORT: Number(METRICS_PORT),
   NODE_ENV,
 });
 

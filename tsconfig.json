@@ -1,6 +1,6 @@
 {
   "exclude": [],
-  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx", "scripts/auth0-login.tjs", "scripts/setup.ms"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2019"],
     "types": ["vitest/globals"],

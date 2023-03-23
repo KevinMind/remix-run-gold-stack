@@ -47,6 +47,9 @@ tasks:
       npm run setup
       npm run build
       npm run dev
+  
+  - name: Auth0
+    command: npm run script ./scripts/auth0-login.mjs
 
 vscode:
   extensions:
