@@ -1,7 +1,8 @@
 #!/usr/bin/env zx
 
 import { $ } from 'zx';
-// import { setEnv } from './utils.mjs';
+
+await $`flyctl auth login`;
 
 const result = await $`flyctl auth token`;
 
