@@ -30,12 +30,10 @@ export async function logout(
 
 export async function requireUser(
   request: Request,
-  options: Parameters<typeof authenticator.isAuthenticated>[1] = {
-    successRedirect: HOME_PATH,
-    failureRedirect: LOGIN_PATH,
-  }
 ) {
-  await authenticator.isAuthenticated(request, options);
+  return authenticator.isAuthenticated(request, {
+    failureRedirect: LOGIN_PATH,
+  });
 }
 
 export async function optionalUser(request: Request) {
