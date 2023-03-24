@@ -11,7 +11,7 @@ const {GITPOD_WORKSPACE_URL} = process.env;
 async function getAuthZeroClientId() {
     const existingClientId = getEnv('AUTH_ZERO_CLIENT_ID');
 
-    if (existingClientId) {
+    if (existingClientId.length) {
         return existingClientId;
     }
 
@@ -49,7 +49,7 @@ async function getAuthZeroClientId() {
 async function getAuthZeroClientSecret(clientId) {
     const existingClientSecret = getEnv('AUTH_ZERO_CLIENT_SECRET');
 
-    if (existingClientSecret) {
+    if (existingClientSecret.length) {
         return existingClientSecret;
     }
 
@@ -101,8 +101,10 @@ async function updateAuthZeroCallbackUrl(callbackUrl, clientId) {
 $.verbose = false;
 
 const clientId = await getAuthZeroClientId();
+
 const callbackUrl = await createAuthZeroCallbackUrl(GITPOD_WORKSPACE_URL, PORT);
 
-updateAuthZeroCallbackUrl(callbackUrl, clientId);
+await getAuthZeroClientSecret(clientId);
+await updateAuthZeroCallbackUrl(callbackUrl, clientId);
 
 setEnv('AUTH_ZERO_CALLBACK_URL', callbackUrl.href);

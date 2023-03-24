@@ -24,11 +24,6 @@ const envSchema = z.object({
   NODE_ENV: NodeEnv.catch("development"),
 });
 
-console.log({
-  PORT,
-  METRICS_PORT,
-});
-
 export const env = envSchema.parse({
   SESSION_SECRET,
   AUTH_ZERO_DOMAIN,
