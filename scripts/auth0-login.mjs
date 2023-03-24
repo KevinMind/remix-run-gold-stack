@@ -1,7 +1,7 @@
 #!/usr/bin/env zx
 
 import { $ } from 'zx';
-import { setEnv } from './utils.mjs';
+import { setEnv, getEnv, log} from './utils.mjs';
 
 function parseDeviceConfirmationCode(input) {
     const urlMatch = input.match(/Open the following URL in a browser: (\S+)/);
@@ -18,6 +18,28 @@ function parseDeviceConfirmationCode(input) {
     };
 }
 
+async function isLoggedIn() {
+  const authZeroDomain = getEnv('AUTH_ZERO_DOMAIN');
+
+  if (authZeroDomain.length) {
+    try {
+      $.verbose = false;
+      await $`auth0 tenants list`;
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+  return false;
+}
+
+if (await isLoggedIn()) {
+  log('already logged in...');
+  process.exit(0);
+}
+
+$.verbose = true;
 const result = await $`auth0 login --no-input`;
 
 const data = parseDeviceConfirmationCode(result.stderr);

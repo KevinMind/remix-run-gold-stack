@@ -1,13 +1,49 @@
 #!/usr/bin/env zx
 
 import { $ } from 'zx';
+import {log} from './utils.mjs';
 
-await $`flyctl auth login`;
+async function getToken(attempts = 0) {
+    if (attempts > 3) throw new Error('max retries exceeded');
 
-const result = await $`flyctl auth token`;
+    try {
+        $.verbose = false;
+        const result = await $`flyctl auth token`;
+        
+        return result.stdout;
+    } catch (error) {
+        if (error.exitCode === 1) {
+            $.verbose = true;
+            await $`flyctl auth login`;
 
-const flyAccessToken = result.stdout;
+            return getToken(attempts + 1);
+        }
+    }
+}
 
-await $`gh auth login`;
+async function setGhToken(token) {
+    try {
+        $.verbose = false;
+        await $`gh auth status`;
 
-await $`gh secret set FLY_API_TOKEN --body ""${flyAccessToken}`;
+        const secrets = await $`gh secret list`;
+
+        const hasFlyApiToken = secrets.stdout.match(RegExp('FLY_API_TOKEN'));
+
+        if (!hasFlyApiToken) {
+            await $`gh secret set FLY_API_TOKEN --body ""${token}`;
+            log('FLY_API_TOKEN is set.');
+        }
+    } catch (error) {
+        if (error.exitCode === 1) {
+            $.verbose = true;
+            await $`gh auth login`;
+            return setGhToken(token);
+        }
+    }
+}
+
+const flyAccessToken = await getToken();
+
+await setGhToken(flyAccessToken);
+
