@@ -5,7 +5,7 @@
 Learn more about [Remix Stacks](https://remix.run/stacks).
 
 ```
-npx create-remix@latest --template remix-run/gold-stack
+npx create-remix@latest --template remix-run/purple-stack
 ```
 
 ## What's in the stack
@@ -27,7 +27,7 @@ npx create-remix@latest --template remix-run/gold-stack
 
 Click this button to create a [Gitpod](https://gitpod.io) workspace with the project set up, Postgres started, and Fly pre-installed
 
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/kevinmind/remix-run-gold-stack/tree/main)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/kevinmind/remix-run-purple-stack/tree/main)
 
 ## Development
 
