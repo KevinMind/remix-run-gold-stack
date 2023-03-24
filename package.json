@@ -1,5 +1,5 @@
 {
-  "name": "lenzhardts",
+  "name": "remix-purple-stack",
   "private": true,
   "sideEffects": false,
   "scripts": {
@@ -17,6 +17,7 @@
     "generate:css": "tailwindcss -o ./app/styles/tailwind.css",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "setup": "npm run script ./scripts/setup.mjs",
+    "create-app": "npm run script ./scripts/create-app.mjs",
     "start": "cross-env NODE_ENV=production node ./build/server.js",
     "start:mocks": "cross-env NODE_ENV=production node --require ./mocks --require dotenv/config ./build/server.js",
     "test": "vitest",

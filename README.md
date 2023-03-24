@@ -27,7 +27,7 @@ npx create-remix@latest --template remix-run/purple-stack
 
 Click this link to create a [Gitpod](https://gitpod.io) workspace with the project set up, Postgres started, and Fly pre-installed
 
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/kevinmind/remix-run-purple-stack/tree/main)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/kevinmind/remix-purple-stack/tree/main)
 
 ## Development
 
@@ -86,14 +86,17 @@ Prior to your first deployment, you'll need to do a few things:
 To configure fly for setting up your production deployments, authenticate:
 
 ```sh
-npm run script ./scripts/fly-login.mjs
+npm run setup
 ```
 
-and create a new app running:
+and create a new production app by running:
 
 ```sh
-npm run script ./scripts/creat-app.mjs
+npm run create-app
 ```
+
+This will create a fly app, database, auth zero production app, and set all relevant environment secrets.
+
 ### Multi-region deploys
 
 Once you have your site and database running in a single region, you can add more regions by following [Fly's Scaling](https://fly.io/docs/reference/scaling/) and [Multi-region PostgreSQL](https://fly.io/docs/getting-started/multi-region-databases/) docs.
