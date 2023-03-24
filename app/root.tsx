@@ -8,7 +8,6 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
 } from "@remix-run/react";
 import { env } from "~/env.server";
 import { optionalUser } from "./auth.server";
@@ -34,10 +33,6 @@ export async function loader({ request }: LoaderArgs) {
 }
 
 export default function App() {
-  const data = useLoaderData<typeof loader>();
-
-  const isUser = Boolean(data.user);
-
   return (
     <html lang="en" className="h-full">
       <head>
@@ -47,7 +42,6 @@ export default function App() {
       <body className="h-full">
         <Progress />
         <Outlet />
-        <div>{isUser ? <p>User</p> : <p>No user</p>}</div>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

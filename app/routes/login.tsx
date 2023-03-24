@@ -8,11 +8,6 @@ import {
 export async function loader({ request }: LoaderArgs) {
   const method = getAuthMethod(request);
 
-  console.log({
-    raw: new URL(request.url).searchParams.get("method"),
-    method,
-  });
-
   await optionalUser(request);
 
   return authenticateRequest(request, method);

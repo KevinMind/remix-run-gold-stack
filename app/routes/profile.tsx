@@ -16,6 +16,9 @@ export default function Profile() {
 
   return (
     <div className="bg-gray-100 min-h-screen">
+      <div className="px-10 py-4">
+        <Link to="/" className="bg-purple hover:bg-purple-600 text-white py-2 px-4 rounded">Home</Link>
+      </div>
       <div className="max-w-2xl mx-auto py-8">
         <div className="bg-white rounded-lg shadow-lg px-8 py-6 mb-6">
           <div className="flex items-center">
