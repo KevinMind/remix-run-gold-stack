@@ -67,18 +67,12 @@ This starts your app in development mode, rebuilding assets on file changes.
 
 If you'd prefer not to use Docker, you can also use Fly's Wireguard VPN to connect to a development database (or even your production database). You can find the instructions to set up Wireguard [here](https://fly.io/docs/reference/private-networking/#install-your-wireguard-app), and the instructions for creating a development database [here](https://fly.io/docs/reference/postgres/).
 
-### Setup auth0
-
-To configure auth0 for development and production, use the accompanying scripts.
-
-```sh
-npm run script ./scripts/auth0-login.mjs
-```
+### Setup deployment and authorization
 
 To configure auth0 in development, use the setup script to authenticate and setup your environment variables.
 
 ```sh
-npm run script ./scripts/setup.mjs
+npm run setup
 ```
 
 ### Relevant code:
