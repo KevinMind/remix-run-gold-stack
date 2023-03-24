@@ -1,5 +1,5 @@
 {
-  "name": "remix-run-purple-stack",
+  "name": "remix-purple-stack",
   "private": true,
   "sideEffects": false,
   "scripts": {
