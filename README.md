@@ -1,6 +1,6 @@
-# Remix Gold Stack
+# Remix Purple Stack
 
-![The Remix Gold Stack](https://repository-images.githubusercontent.com/461012689/37d5bd8b-fa9c-4ab0-893c-f0a199d5012d)
+![The Remix Purple Stack](https://user-images.githubusercontent.com/19595165/227536181-e93686eb-f0ae-4f7b-8c84-e57632db5577.png)
 
 Learn more about [Remix Stacks](https://remix.run/stacks).
 
