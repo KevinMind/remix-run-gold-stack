@@ -1,12 +1,12 @@
 import choice from 'cli-select';
 import 'dotenv/config';
 import { $, chalk } from 'zx';
-import { log} from './utils.mjs';
+import { log} from './utils';
 
 export async function getAuthZeroApps() {
     const allApps = await $`auth0 apps list --format json`
     
-    const apps = JSON.parse(allApps.stdout).map((app) => ({
+    const apps = JSON.parse(allApps.stdout).map((app: any) => ({
         name: app.name,
         clientId: app.client_id,
     }));
@@ -19,8 +19,8 @@ export async function getAuthZeroClientId() {
 
     log('Select auth0 app to use');
     
-    const selectedApp = await choice({
-        values: apps.map((app) => app.name),
+    const selectedApp = await choice<number>({
+        values: apps.map((app: any) => app.name),
         valueRenderer: (value, selected) => {
             const text = chalk.black(value.toString());
             if (selected) {
@@ -39,9 +39,9 @@ export async function getAuthZeroClientId() {
     return clientId;
 }
 
-export async function getAuthZeroClientSecret(clientId) {
-    function parseKeyValues(input) {
-        const result = {};
+export async function getAuthZeroClientSecret(clientId: string) {
+    function parseKeyValues(input: string) {
+        const result: {[key: string]: string} = {};
       
         // Split the input string into lines
         const lines = input.split('\n');
@@ -70,7 +70,7 @@ export async function getAuthZeroClientSecret(clientId) {
     return clientSecret;
 }
 
-export function createAuthZeroCallbackUrl(baseUrl, port) {
+export function createAuthZeroCallbackUrl(baseUrl: string, port: string) {
     const url = new URL(baseUrl);
 
     url.host = `${port}-${url.host}`;
@@ -79,6 +79,6 @@ export function createAuthZeroCallbackUrl(baseUrl, port) {
     return url;
 }
 
-export async function updateAuthZeroCallbackUrl(callbackUrl, clientId) {
+export async function updateAuthZeroCallbackUrl(callbackUrl: string, clientId: string) {
     await $`auth0 apps update ${clientId} -c ${callbackUrl}`;
 }

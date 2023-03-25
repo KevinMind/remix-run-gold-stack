@@ -2,15 +2,14 @@
 
 import { $, fs } from 'zx';
 import tomml from 'toml';
-import { log , getEnv} from './utils.mjs';
-import { getAuthZeroClientId, getAuthZeroClientSecret, createAuthZeroCallbackUrl, getAuthZeroApps, updateAuthZeroCallbackUrl } from './shared.mjs';
+import { log , getEnv} from './utils';
+import { getAuthZeroApps, updateAuthZeroCallbackUrl } from './shared';
 
-const flyToml = fs.readFileSync('./fly.toml');
+const flyToml = fs.readFileSync('../fly.toml', 'utf-8');
 
 const result = tomml.parse(flyToml);
 
 const appName = result.app;
-const appPort = result.env['PORT'];
 
 if (!appName) {
     throw new Error('app name is required');
@@ -20,9 +19,11 @@ if (!appName) {
 
 $.verbose = false;
 
-const existingApps = JSON.parse(await $`flyctl apps list --json`);
+const flyAppList = await $`flyctl apps list --json`;
 
-const foundApp = existingApps.some((app) => app.ID === appName);
+const existingApps = JSON.parse(flyAppList.stdout);
+
+const foundApp = existingApps.some((app: any) => app.ID === appName);
 
 if (foundApp) {
     log(`found app: ${appName} in fly no need to create`);
@@ -35,7 +36,7 @@ if (foundApp) {
 
 const dbName = `${appName}-db`;
 
-const foundDb = existingApps.some((app) => app.ID === dbName);
+const foundDb = existingApps.some((app: any) => app.ID === dbName);
 
 if (foundDb) {
     log(`found db: ${dbName}`);
@@ -57,7 +58,7 @@ const authZeroApps = await getAuthZeroApps();
 
 const authZeroProductionName = `${appName}-production`;
 
-const foundAuthZeroApp = authZeroApps.find((app) => app.name === authZeroProductionName);
+const foundAuthZeroApp = authZeroApps.find((app: any) => app.name === authZeroProductionName);
 
 let clientId;
 let clientSecret;
@@ -87,7 +88,7 @@ if (foundAuthZeroApp) {
 
 const baseURL = `https://${appName}.fly.dev/auth/callback`;
 
-async function flySetSecret(key, value) {
+async function flySetSecret(key: string, value: string) {
     await $`flyctl secrets set ${key}=${value} --app ${appName} --detach`;
 }
 

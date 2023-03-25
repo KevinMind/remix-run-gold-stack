@@ -2,19 +2,18 @@ import {fs, chalk} from 'zx';
 import os from 'os';
 
 import {config} from 'dotenv';
-import { join } from 'path';
 
-export function log(...args) {
+export function log(...args: any[]) {
     console.log(chalk.blue(...args, '\n'));
 }
 
 function readEnv() {
     return config({
         path: './.env',
-    }).parsed;
+    }).parsed ?? {};
 }
 
-export function setEnv(key, value) {
+export function setEnv(key: string, value: string) {
     const env = readEnv();
 
     env[key] = value;
@@ -24,10 +23,8 @@ export function setEnv(key, value) {
     fs.writeFileSync("./.env", Object.entries(env).map(([key, value]) => `${key}=${value}`).join(os.EOL));
 }
 
-export function getEnv(key) {
-    const env = config({
-        path: join(__dirname, '..', '.env'),
-    }).parsed;
+export function getEnv(key: string) {
+    const env = readEnv();
 
     return env[key];
 }

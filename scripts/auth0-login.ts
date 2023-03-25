@@ -1,9 +1,9 @@
 #!/usr/bin/env zx
 
 import { $ } from 'zx';
-import { setEnv, getEnv, log} from './utils.mjs';
+import { setEnv, getEnv, log} from './utils';
 
-function parseDeviceConfirmationCode(input) {
+function parseDeviceConfirmationCode(input: string) {
     const urlMatch = input.match(/Open the following URL in a browser: (\S+)/);
 
     const tenantMatch = input.match(/Tenant: (\S+)/);
@@ -21,7 +21,7 @@ function parseDeviceConfirmationCode(input) {
 async function isLoggedIn() {
   const authZeroDomain = getEnv('AUTH_ZERO_DOMAIN');
 
-  if (authZeroDomain.length) {
+  if (authZeroDomain?.length) {
     try {
       $.verbose = false;
       await $`auth0 tenants list`;

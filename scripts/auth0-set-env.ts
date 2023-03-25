@@ -2,36 +2,40 @@
 
 import 'dotenv/config';
 import { $ } from 'zx';
-import { setEnv, getEnv} from './utils.mjs';
+import { setEnv, getEnv} from './utils';
 
-import { getAuthZeroClientId, getAuthZeroClientSecret, createAuthZeroCallbackUrl, updateAuthZeroCallbackUrl } from './shared.mjs';
+import { getAuthZeroClientId, getAuthZeroClientSecret, createAuthZeroCallbackUrl, updateAuthZeroCallbackUrl } from './shared';
 
 const PORT = getEnv('PORT') || '3000';
 const {GITPOD_WORKSPACE_URL} = process.env;
 
+if (!GITPOD_WORKSPACE_URL) {
+    throw new Error('missing GITPOD_WORKSPACE_URL');
+}
+
 async function setAuthZeroClientID() {
     const existingClientId = getEnv('AUTH_ZERO_CLIENT_ID');
 
-    if (existingClientId.length) {
+    if (existingClientId?.length) {
         return existingClientId;
     }
 
-    const clientId = getAuthZeroClientId();
+    const clientId = await getAuthZeroClientId();
 
     setEnv('AUTH_ZERO_CLIENT_ID', clientId);
 
     return clientId;
 }
 
-async function setAuthZeroClientSecret(clientId) {
+async function setAuthZeroClientSecret(clientId: string) {
     const existingClientSecret = getEnv('AUTH_ZERO_CLIENT_SECRET');
 
-    if (existingClientSecret.length) {
+    if (existingClientSecret?.length) {
         return existingClientSecret;
     }
 
 
-    const clientSecret = getAuthZeroClientSecret(clientId);
+    const clientSecret = await getAuthZeroClientSecret(clientId);
 
     setEnv('AUTH_ZERO_CLIENT_SECRET', clientSecret);
     
