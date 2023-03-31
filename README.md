@@ -5,7 +5,7 @@
 Learn more about [Remix Stacks](https://remix.run/stacks).
 
 ```
-npx create-remix@latest --template remix-run/purple-stack
+npx create-remix@latest --template KevinMind/remix-run-purple-stack
 ```
 
 ## What's in the stack
