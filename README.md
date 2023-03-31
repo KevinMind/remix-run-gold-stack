@@ -27,7 +27,7 @@ npx create-remix@latest --template KevinMind/remix-run-purple-stack
 
 Click this link to create a [Gitpod](https://gitpod.io) workspace with the project set up, Postgres started, and Fly pre-installed
 
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/kevinmind/remix-purple-stack/tree/main)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/kevinmind/remix-run-purple-stack/tree/main)
 
 ## Development
 
