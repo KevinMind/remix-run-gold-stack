@@ -3,16 +3,18 @@
 import { $, fs } from "zx";
 import tomml from "toml";
 import { log, getEnv, step } from "../../utils";
-import {
+import auth0Login, {
   getAuthZeroApps,
   updateAuthZeroCallbackUrl,
 } from "../../services/auth0";
-import {
+import flyLogin, {
   flyCreateApp,
   flyCreateDB,
   flySetSecret,
   getFlyApp,
 } from "../../services/fly";
+
+await step("fly login", flyLogin);
 
 const flyToml = fs.readFileSync("../fly.toml", "utf-8");
 
@@ -24,29 +26,37 @@ if (!appName) {
   throw new Error("app name is required");
 }
 
-step("create fly app", async () => {
+await step("create fly app", async () => {
   const flyApp = await getFlyApp(appName);
 
-  if (!flyApp) {
+  if (flyApp) {
     log(`found app: ${appName} in fly no need to create`);
-  } else {
-    await flyCreateApp(appName);
+
+    return;
   }
+
+  await flyCreateApp(appName);
+
+  log(`created app: ${appName}`);
 });
 
-step("create fly db app", async () => {
+await step("create fly db app", async () => {
   const dbName = `${appName}-db`;
 
   const dbApp = await getFlyApp(dbName);
 
-  if (!dbApp) {
-    log(`found db: ${dbName}`);
-  } else {
-    await flyCreateDB(appName, dbName);
+  if (dbApp) {
+    return log(`found db: ${dbName}`);
   }
+
+  await flyCreateDB(appName, dbName);
+
+  return log(`created db: ${dbName}`);
 });
 
-step("create an auth0 production app", async () => {
+await step("create an auth0 production app", async () => {
+  await auth0Login();
+
   const authZeroApps = await getAuthZeroApps();
 
   const authZeroProductionName = `${appName}-production`;
