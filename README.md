@@ -48,7 +48,7 @@ Click this link to create a [Gitpod](https://gitpod.io) workspace with the proje
 - Initial setup:
 
   ```sh
-  npm run setup
+  npm run script setup
   ```
 
 - Run the first build:
@@ -72,7 +72,7 @@ If you'd prefer not to use Docker, you can also use Fly's Wireguard VPN to conne
 To configure auth0 in development, use the setup script to authenticate and setup your environment variables.
 
 ```sh
-npm run setup
+npm run script setup
 ```
 
 ### Relevant code:
@@ -86,13 +86,13 @@ Prior to your first deployment, you'll need to do a few things:
 To configure fly for setting up your production deployments, authenticate:
 
 ```sh
-npm run setup
+npm run script setup
 ```
 
 and create a new production app by running:
 
 ```sh
-npm run create-app
+npm run script create-app
 ```
 
 This will create a fly app, database, auth zero production app, and set all relevant environment secrets.
