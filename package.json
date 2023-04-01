@@ -23,7 +23,7 @@
     "test": "vitest",
     "typecheck": "tsc",
     "validate": "run-p \"test -- --run\" lint typecheck",
-    "script": "npm --prefix scripts run script"
+    "script": "npm --prefix scripts run exec-script"
   },
   "prettier": {},
   "eslintIgnore": [

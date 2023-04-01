@@ -47,7 +47,7 @@ tasks:
       npm run setup
       npm run build
       npm run dev
-  
+
 vscode:
   extensions:
     - ms-azuretools.vscode-docker
