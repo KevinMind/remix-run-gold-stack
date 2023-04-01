@@ -2,6 +2,7 @@
 
 import { $ } from "zx";
 import { z } from "zod";
+import invariant from 'tiny-invariant';
 import { setEnv, getEnv, step } from "../../utils";
 
 import auth0Login, {
@@ -13,17 +14,16 @@ import auth0Login, {
 
 const envSchema = z.object({
   PORT: z.string().catch("3000"),
-  METRICS_PORT: z.string().catch("30001"),
   GITPOD_WORKSPACE_URL: z.string().min(1),
 });
 
 const env = await step<z.infer<typeof envSchema>>("basic env", async () => {
   const { GITPOD_WORKSPACE_URL } = process.env;
   const PORT = getEnv("PORT") || "3000";
-  const METRICS_PORT = getEnv("METRICS_PORT") || "3001";
 
   setEnv("PORT", PORT.toString());
-  setEnv("METRICS_PORT", METRICS_PORT.toString());
+
+
 
   if (!GITPOD_WORKSPACE_URL) {
     throw new Error("missing GITPOD_WORKSPACE_URL");
@@ -31,7 +31,6 @@ const env = await step<z.infer<typeof envSchema>>("basic env", async () => {
 
   return envSchema.parse({
     PORT,
-    METRICS_PORT,
     GITPOD_WORKSPACE_URL,
   });
 });
@@ -51,6 +50,8 @@ await step("auth0 client setup", async () => {
     }
 
     const clientId = await getAuthZeroClientId();
+
+    invariant(clientId);
 
     setEnv("AUTH_ZERO_CLIENT_ID", clientId);
 
