@@ -1,5 +1,7 @@
 {
-  "exclude": [],
+  "exclude": [
+    "./scripts/**/*.ts"
+  ],
   "include": ["**/*.ts", "**/*.tsx"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2019"],
