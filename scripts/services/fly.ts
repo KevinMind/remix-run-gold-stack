@@ -1,5 +1,36 @@
-import { $ } from "zx";
-import { log } from "../utils";
+import type { ProcessOutput } from "zx";
+import { $, fs } from "zx";
+import tomml from "toml";
+
+import { log, logImportant } from "../utils";
+
+export function getFlyAppName() {
+  const flyToml = fs.readFileSync("../fly.toml", "utf-8");
+
+  const result = tomml.parse(flyToml);
+
+  const appName = result.app;
+
+  if (!appName) {
+    throw new Error("app name is required");
+  }
+
+  const dbName = `${appName}-db`;
+
+  return { appName, dbName };
+}
+
+export async function flyAppDelete(appName: string) {
+  $.verbose = false;
+  try {
+    await $`flyctl destroy ${appName} --yes`;
+  } catch (error) {
+    if ((error as ProcessOutput).stderr.includes("Error Could not find App"))
+      return;
+
+    throw error;
+  }
+}
 
 export async function getApps() {
   $.verbose = false;
@@ -17,13 +48,12 @@ export async function getFlyApp(appName: string) {
 
 export async function flyCreateApp(appName: string) {
   log(`creating app: ${appName}`);
-  $.verbose = true;
+  $.verbose = false;
   await $`fly apps create ${appName}`;
-  await $`fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app ${appName}`;
+    await $`fly secrets set SESSION_SECRET=$(openssl rand -hex 32) --app ${appName}`;
 }
 
 interface DbInfo {
-  name: string;
   userName: string;
   password: string;
   port: number;
@@ -31,15 +61,14 @@ interface DbInfo {
 }
 
 function extractPostgresInfo(input: string, dbName: string): DbInfo {
-  const name = /cluster\s+(\w+)/.exec(input)?.[1];
   const userName = /Username:\s+(\w+)/.exec(input)?.[1];
   const password = /Password:\s+(\w+)/.exec(input)?.[1];
   const port = /Postgres port:\s+(\d+)/.exec(input)?.[1];
 
-  if (!name || !userName || !password || !port) throw new Error('could not parse postgress info');
-  
+  if (!userName || !password || !port)
+    throw new Error("could not parse postgress info");
+
   return {
-    name,
     userName,
     password,
     port: parseInt(port),
@@ -47,9 +76,13 @@ function extractPostgresInfo(input: string, dbName: string): DbInfo {
   };
 }
 
-function flyDbConnectionString({userName, password, hostname, port, name}: DbInfo) {
-  return `postgres://${userName}:${password}@${hostname}:${port}/${name}?options
-  `
+function flyDbConnectionString({
+  userName,
+  password,
+  hostname,
+  port,
+}: DbInfo) {
+  return `postgres://${userName}:${password}@${hostname}:${port}`;
 }
 
 export async function flyCreateDB(appName: string, dbName: string) {
@@ -61,20 +94,20 @@ export async function flyCreateDB(appName: string, dbName: string) {
 
   log(`creating database ${dbName} for ${appName}...`);
 
-  const dbCreateResult = await $`fly postgres create --name ${dbName} --region ${region} --volume-size ${volumeSize} --initial-cluster-size ${initialClusterSize} --vm-size ${vmSize} `;
+    const dbCreateResult =
+      await $`fly postgres create --name ${dbName} --region ${region} --volume-size ${volumeSize} --initial-cluster-size ${initialClusterSize} --vm-size ${vmSize} `;
 
-  log('attatching databse to app...');
+    log("attatching databse to app...");
 
-  await $`fly postgres attach --app ${appName} ${dbName}`;
+    await $`fly postgres attach --app ${appName} ${dbName}`;
 
-  const dbInfo = extractPostgresInfo(dbCreateResult.stdout, dbName);
+    const dbInfo = extractPostgresInfo(dbCreateResult.stdout, dbName);
 
-  log('allocating public ip address...');
+    log("allocating public ip address...");
 
-  await $`fly ips allocate-v4 --app ${dbName}`;
+    await $`fly ips allocate-v4 --app ${dbName} --yes`;
 
-  log(`connection string: ${flyDbConnectionString(dbInfo)}`)
-
+    logImportant(`connection string: ${flyDbConnectionString(dbInfo)}`);
 }
 
 export async function flySetSecret(
@@ -82,7 +115,13 @@ export async function flySetSecret(
   key: string,
   value: string
 ) {
+  $.verbose = false;
   await $`flyctl secrets set ${key}=${value} --app ${appName} --detach`;
+}
+
+export async function flyUnsetSecret(appName: string, key: string) {
+  $.verbose = false;
+  await $`flyctl secrets unset ${key} --app ${appName} --detach`;
 }
 
 export default async function flyLogin(attempts = 0): Promise<string> {

@@ -1,4 +1,4 @@
-import { fs, chalk, $ } from "zx";
+import { fs, chalk, $, spinner} from "zx";
 import os from "os";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -14,6 +14,14 @@ $.cwd = projectRootPath;
 
 export function log(...args: any[]) {
   console.log(chalk.blue(...args, "\n"));
+}
+
+export function logImportant(...args: any[]) {
+  console.log(chalk.bgBlue(chalk.white(chalk.bold('IMPORTANT!'), ...args, "\n")));
+}
+
+function logStep(...args: any[]) {
+  console.log(chalk.green("<----", ...args, "---->", "\n"));
 }
 
 function readEnv() {
@@ -46,10 +54,9 @@ export function getEnv(key: string) {
 }
 
 export async function step<T = never>(name: string, cb: () => Promise<T>) {
-  log(`running step: ${name}`);
+  logStep(`step: ${name}`);
 
-  const result = await cb();
+  const result = await spinner(async () => cb());
 
-  log(`finished step: ${name}`);
   return result;
 }

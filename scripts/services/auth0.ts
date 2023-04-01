@@ -35,7 +35,9 @@ export async function isLoggedIn() {
   return false;
 }
 
-export async function getAuthZeroApps() {
+export async function getAuthZeroApps(): Promise<
+  { name: string; clientId: string }[]
+> {
   const allApps = await $`auth0 apps list --format json`;
 
   const apps = JSON.parse(allApps.stdout).map((app: any) => ({
@@ -46,13 +48,43 @@ export async function getAuthZeroApps() {
   return apps;
 }
 
-export async function getAuthZeroClientId() {
+export async function createAuthZeroApp(appName: string) {
+  const result =
+    await $`auth0 apps create -n ${appName} -t regular --reveal --format json`;
+
+  const app = JSON.parse(result.stdout);
+
+  return {
+    clientId: app["client_id"],
+    clientSecret: app["client_secret"],
+  };
+}
+
+export async function deleteAuthZeroApp(appName: string) {
+  const clientId = await getAuthZeroClientId(appName);
+  $.verbose = false;
+  await $`auth0 apps delete ${clientId}`;
+}
+
+export async function getAuthZeroClientId(appName?: string) {
   const apps = await getAuthZeroApps();
+
+  if (appName) {
+    const app = apps.find((app) => app.name === appName);
+
+    return app?.clientId;
+  }
 
   log("Select auth0 app to use");
 
   const selectedApp = await choice<number>({
-    values: apps.map((app: any) => app.name),
+    values: apps.reduce(
+      (acm, key, idx) => ({
+        ...acm,
+        [key.name]: idx,
+      }),
+      {}
+    ),
     valueRenderer: (value, selected) => {
       const text = chalk.black(value.toString());
       if (selected) {
@@ -62,7 +94,7 @@ export async function getAuthZeroClientId() {
     },
   });
 
-  const app = apps[selectedApp.id];
+  const app = apps[selectedApp.value];
 
   log(`selected: ${app.name}`);
 
@@ -120,7 +152,6 @@ export async function updateAuthZeroCallbackUrl(
 
 export default async function auth0Login() {
   if (await isLoggedIn()) {
-    log("already logged in...");
     return;
   }
 
