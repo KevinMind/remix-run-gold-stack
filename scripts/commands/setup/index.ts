@@ -10,8 +10,6 @@ import auth0Login, {
   getAuthZeroClientSecret,
   updateAuthZeroCallbackUrl,
 } from "../../services/auth0";
-import flyLogin from "../../services/fly";
-import loginGithub, { setGhToken } from "../../services/github";
 
 const envSchema = z.object({
   PORT: z.string().catch("3000"),
@@ -84,18 +82,6 @@ await step("auth0 client setup", async () => {
   await updateAuthZeroCallbackUrl(callbackUrl.href, clientId);
 
   setEnv("AUTH_ZERO_CALLBACK_URL", callbackUrl.href);
-});
-
-await step("fly.io cli", async () => {
-  // login to fly.io
-  $.verbose = true;
-  const flyToken = await flyLogin();
-
-  // login to github
-  await loginGithub();
-
-  // set fly token in github secrets
-  await setGhToken("FLY_API_TOKEN", flyToken);
 });
 
 await step("prisma client + db seed", async () => {

@@ -1,4 +1,4 @@
-import { fs, chalk, $, spinner} from "zx";
+import { fs, chalk, $, spinner } from "zx";
 import os from "os";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -17,7 +17,9 @@ export function log(...args: any[]) {
 }
 
 export function logImportant(...args: any[]) {
-  console.log(chalk.bgBlue(chalk.white(chalk.bold('IMPORTANT!'), ...args, "\n")));
+  console.log(
+    chalk.bgBlue(chalk.white(chalk.bold("IMPORTANT!"), ...args, "\n"))
+  );
 }
 
 function logStep(...args: any[]) {

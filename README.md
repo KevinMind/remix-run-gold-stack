@@ -10,9 +10,6 @@ npx create-remix@latest --template kevin-mind/remix-run-purple-stack
 
 ## What's in the stack
 
-- [Multi-region Fly app deployment](https://fly.io/docs/reference/scaling/) with [Docker](https://www.docker.com/)
-- [Multi-region Fly PostgreSQL Cluster](https://fly.io/docs/getting-started/multi-region-databases/)
-- Healthcheck endpoint for [Fly backups region fallbacks](https://fly.io/docs/reference/configuration/#services-http_checks)
 - [GitHub Actions](https://github.com/features/actions) for deploy on merge to production and staging environments
 - [Auth0 Authentication](https://auth0.com/) for authenticating users
 - Database ORM with [Prisma](https://prisma.io)
@@ -25,7 +22,7 @@ npx create-remix@latest --template kevin-mind/remix-run-purple-stack
 
 ## Quickstart
 
-Click this link to create a [Gitpod](https://gitpod.io) workspace with the project set up, Postgres started, and Fly pre-installed
+Click this link to create a [Gitpod](https://gitpod.io) workspace with the project set up
 
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/kevin-mind/remix-run-purple-stack/tree/main)
 
@@ -65,8 +62,6 @@ Click this link to create a [Gitpod](https://gitpod.io) workspace with the proje
 
 This starts your app in development mode, rebuilding assets on file changes.
 
-If you'd prefer not to use Docker, you can also use Fly's Wireguard VPN to connect to a development database (or even your production database). You can find the instructions to set up Wireguard [here](https://fly.io/docs/reference/private-networking/#install-your-wireguard-app), and the instructions for creating a development database [here](https://fly.io/docs/reference/postgres/).
-
 ### Setup deployment and authorization
 
 To configure auth0 in development, use the setup script to authenticate and setup your environment variables.
@@ -80,34 +75,6 @@ npm run script setup
 ## Deployment
 
 This Remix Stack comes with two GitHub Actions that handle automatically deploying your app to production and staging environments.
-
-Prior to your first deployment, you'll need to do a few things:
-
-To configure fly for setting up your production deployments, authenticate:
-
-```sh
-npm run script setup
-```
-
-and create a new production app by running:
-
-```sh
-npm run script create-app
-```
-
-This will create a fly app, database, auth zero production app, and set all relevant environment secrets.
-
-### Multi-region deploys
-
-Once you have your site and database running in a single region, you can add more regions by following [Fly's Scaling](https://fly.io/docs/reference/scaling/) and [Multi-region PostgreSQL](https://fly.io/docs/getting-started/multi-region-databases/) docs.
-
-Make certain to set a `PRIMARY_REGION` environment variable for your app. You can use `[env]` config in the `fly.toml` to set that to the region you want to use as the primary region for both your app and database.
-
-#### Testing your app in other regions
-
-Install the [ModHeader](https://modheader.com/) browser extension (or something similar) and use it to load your app with the header `fly-prefer-region` set to the region name you would like to test.
-
-You can check the `x-fly-region` header on the response to know which region your request was handled by.
 
 ## GitHub Actions
 

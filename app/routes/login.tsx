@@ -1,4 +1,4 @@
-import type { LoaderArgs, MetaFunction } from "@remix-run/node";
+import type { LoaderArgs, MetaFunction } from "@vercel/remix";
 import {
   authenticateRequest,
   getAuthMethod,

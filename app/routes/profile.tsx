@@ -1,5 +1,5 @@
 import type { LoaderArgs } from "@remix-run/server-runtime";
-import { json } from "@remix-run/node";
+import { json } from "@vercel/remix";
 import { Link, useLoaderData } from "@remix-run/react";
 import { requireUser } from "~/auth.server";
 

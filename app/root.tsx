@@ -1,6 +1,6 @@
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
-import type { LoaderArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "@vercel/remix";
+import type { LoaderArgs } from "@vercel/remix";
+import { json } from "@vercel/remix";
 import {
   Links,
   LiveReload,
@@ -9,6 +9,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { Analytics } from "@vercel/analytics/react";
 import { env } from "~/env.server";
 import { optionalUser } from "./auth.server";
 import { Progress } from "./components/Progress";
@@ -45,6 +46,7 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+        <Analytics />
       </body>
     </html>
   );
