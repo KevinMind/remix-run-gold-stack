@@ -7,8 +7,6 @@ import prom from "@isaacs/express-prometheus-middleware";
 
 import { env, isProduction } from "~/env.server";
 
-console.log('DATABASE_URL', process.env.DATABASE_URL);
-
 const app = express();
 const metricsApp = express();
 app.use(
