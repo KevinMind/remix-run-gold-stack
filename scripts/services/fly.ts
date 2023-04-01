@@ -93,6 +93,7 @@ export async function flyCreateDB(appName: string, dbName: string) {
   const vmSize = "shared-cpu-1x";
 
   log(`creating database ${dbName} for ${appName}...`);
+  $.verbose = true;
 
     const dbCreateResult =
       await $`fly postgres create --name ${dbName} --region ${region} --volume-size ${volumeSize} --initial-cluster-size ${initialClusterSize} --vm-size ${vmSize} `;
@@ -107,7 +108,7 @@ export async function flyCreateDB(appName: string, dbName: string) {
 
     await $`fly ips allocate-v4 --app ${dbName} --yes`;
 
-    logImportant(`connection string: ${flyDbConnectionString(dbInfo)}`);
+    logImportant(`public database connection string: ${flyDbConnectionString(dbInfo)}`);
 }
 
 export async function flySetSecret(
