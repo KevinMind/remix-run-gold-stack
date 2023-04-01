@@ -7,7 +7,7 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "target": "ES2022", // ES2020 in earlier versions
-    "esModuleInterop": true,
+    "esModuleInterop": true
   },
   "ts-node": {
     "esm": true,
@@ -15,5 +15,5 @@
     "files": true,
     "compilerOptions": {},
     "experimentalSpecifierResolution": "node"
-  },
+  }
 }

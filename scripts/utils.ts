@@ -1,38 +1,55 @@
-import {fs, chalk} from 'zx';
-import os from 'os';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { fs, chalk, $ } from "zx";
+import os from "os";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
-import {config} from 'dotenv';
+import { config } from "dotenv";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const projectRootPath = join(__dirname, '..');
-const dotEnvPath = join(projectRootPath, '.env');
+const projectRootPath = join(__dirname, "..");
+const dotEnvPath = join(projectRootPath, ".env");
+
+$.cwd = projectRootPath;
 
 export function log(...args: any[]) {
-    console.log(chalk.blue(...args, '\n'));
+  console.log(chalk.blue(...args, "\n"));
 }
 
 function readEnv() {
-    return config({
-        path: dotEnvPath,
-    }).parsed ?? {};
+  return (
+    config({
+      path: dotEnvPath,
+    }).parsed ?? {}
+  );
 }
 
 export function setEnv(key: string, value: string) {
-    const env = readEnv();
+  const env = readEnv();
 
-    env[key] = value;
+  env[key] = value;
 
-    log(`setting ${key}=${value}`)
+  log(`setting ${key}=${value}`);
 
-    fs.writeFileSync(dotEnvPath, Object.entries(env).map(([key, value]) => `${key}=${value}`).join(os.EOL));
+  fs.writeFileSync(
+    dotEnvPath,
+    Object.entries(env)
+      .map(([key, value]) => `${key}=${value}`)
+      .join(os.EOL)
+  );
 }
 
 export function getEnv(key: string) {
-    const env = readEnv();
+  const env = readEnv();
 
-    return env[key];
+  return env[key];
+}
+
+export async function step<T = never>(name: string, cb: () => Promise<T>) {
+  log(`running step: ${name}`);
+
+  const result = await cb();
+
+  log(`finished step: ${name}`);
+  return result;
 }

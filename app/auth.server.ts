@@ -8,7 +8,7 @@ import { Auth0Strategy } from "remix-auth-auth0";
 import { sessionStorage } from "~/session.server";
 import type { User } from "~/models/user.server";
 import { createUser, getUserByEmail } from "~/models/user.server";
-import { env} from "./env.server";
+import { env } from "./env.server";
 
 let authenticator = new Authenticator<User>(sessionStorage);
 
@@ -28,9 +28,7 @@ export async function logout(
   return authenticator.logout(request, options);
 }
 
-export async function requireUser(
-  request: Request,
-) {
+export async function requireUser(request: Request) {
   return authenticator.isAuthenticated(request, {
     failureRedirect: LOGIN_PATH,
   });
@@ -43,7 +41,7 @@ export async function optionalUser(request: Request) {
 export function authenticateRequest(
   request: Request,
   method: AuthMethods,
-  options?: Parameters<typeof authenticator.authenticate>[2],
+  options?: Parameters<typeof authenticator.authenticate>[2]
 ) {
   return authenticator.authenticate(method, request, options);
 }

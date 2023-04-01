@@ -1,14 +1,15 @@
 {
-    "name": "scripts",
-    "type": "module",
-    "dependencies": {
-        "cli-select": "^1.1.2",
-        "dotenv": "^16.0.3",
-        "ts-node": "^10.9.1",
-        "typescript": "^4.9.4",
-        "zx": "^7.2.1"
-    },
-    "scripts": {
-        "script": "ts-node"
-    }
+  "name": "scripts",
+  "type": "module",
+  "dependencies": {
+    "cli-select": "^1.1.2",
+    "dotenv": "^16.0.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4",
+    "zx": "^7.2.1"
+  },
+  "scripts": {
+    "script": "ts-node",
+    "exec-script": "ts-node exec"
+  }
 }

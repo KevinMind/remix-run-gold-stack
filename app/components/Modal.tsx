@@ -10,7 +10,7 @@ export function ModalActions({ children }: { children: ReactNode }) {
 export function ModalBody({ children }: { children: ReactNode }) {
   return (
     <div className="mt-2">
-      <p className="text-sm text-gray-500">{children}</p>
+      <p className="text-gray-500 text-sm">{children}</p>
     </div>
   );
 }
@@ -23,7 +23,7 @@ export function ModalTitle({
   return (
     <Dialog.Title
       as={as}
-      className="text-lg font-medium leading-6 text-gray-900"
+      className="text-gray-900 text-lg font-medium leading-6"
       {...props}
     >
       {children}
