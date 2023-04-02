@@ -9,7 +9,7 @@
     "dev": "run-p dev:*",
     "dev:css": "cross-env NODE_ENV=development npm run generate:css -- --watch",
     "dev:remix": "cross-env NODE_ENV=development remix dev",
-    "format": "prettier --write . --check '!./postgres-data'",
+    "format": "prettier --write . ",
     "generate:css": "tailwindcss -o ./app/styles/tailwind.css",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "start:mocks": "cross-env NODE_ENV=production node --require ./mocks --require dotenv/config ./build/server.js",
@@ -22,8 +22,7 @@
   "eslintIgnore": [
     "/node_modules",
     "/build",
-    "/public/build",
-    "/postgres-data"
+    "/public/build"
   ],
   "dependencies": {
     "@cloudinary/react": "^1.11.0",

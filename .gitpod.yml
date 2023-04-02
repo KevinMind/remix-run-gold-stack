@@ -39,7 +39,6 @@ tasks:
 
   - init: npm install
     command: |
-      gp await-port 5432
       npm run script setup
       npm run build
       npm run dev
