@@ -11,5 +11,9 @@
   "scripts": {
     "script": "ts-node",
     "exec-script": "ts-node exec"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.3",
+    "@types/node": "^18.11.18"
   }
 }
