@@ -11,7 +11,7 @@
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "typecheck": "tsc",
     "validate": "run-p lint typecheck",
-    "script": "pnpm run --dir scripts exec-script --stream"
+    "script": "pnpm run --dir scripts exec-script"
   },
   "dependencies": {
     "@remix-run/node": "^1.14.3",
