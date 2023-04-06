@@ -5,9 +5,13 @@ import { fileURLToPath } from "url";
 
 import { config } from "dotenv";
 
+import pkgJson from "../package.json" assert { type: "json" };
+
+export { pkgJson };
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const projectRootPath = join(__dirname, "..");
+export const projectRootPath = join(__dirname, "..");
 const dotEnvPath = join(projectRootPath, ".env");
 
 $.cwd = projectRootPath;
@@ -55,10 +59,28 @@ export function getEnv(key: string) {
   return env[key];
 }
 
-export async function step<T = never>(name: string, cb: () => Promise<T>) {
+export async function step<T = never>(
+  name: string,
+  cb: () => Promise<T>,
+  options: { spinner: boolean } = { spinner: true }
+) {
   logStep(`step: ${name}`);
 
-  const result = await spinner(async () => cb());
+  const result = options.spinner ? await spinner(async () => cb()) : await cb();
 
   return result;
+}
+
+export async function open(url: string) {
+  $`
+  if [ -n $BROWSER ]; then
+    $BROWSER '${url}'
+  elif which xdg-open > /dev/null; then
+    xdg-open '${url}'
+  elif which gnome-open > /dev/null; then
+    gnome-open '${url}'
+  else
+  echo "Failed to open '${url}'."
+fi
+  `;
 }
