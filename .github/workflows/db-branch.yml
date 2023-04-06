@@ -1,0 +1,24 @@
+name: Create a database branch
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  create_a_branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: test
+        run: 'echo branch: ${{ github.event.pull_request.base.ref }}'
+      - name: Create a branch
+        uses: planetscale/create-branch-action@v1
+        id: create_branch
+        with:
+          org_name: ${{ secrets.PLANETSCALE_ORG }}
+          database_name: ${{ secrets.PLANETSCALE_DATABASE }}
+          branch_name: ${{ github.event.pull_request.base.ref }}
+          from: main
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
