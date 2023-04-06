@@ -6,3 +6,5 @@ node_modules
 /tmp
 /public/build
 .env
+
+/mysql-data
