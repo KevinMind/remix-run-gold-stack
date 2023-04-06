@@ -1,0 +1,68 @@
+name: Create a branch
+on: create
+
+1. create gh cli interface to. get asnd store secrets from cli
+2. implement pscale and vercel scripts to prompt creation of access tokens and save to gh
+3. implement script to create prod dbif not exist in CI
+4. implement script to create dev db and branch on current branch
+5. implement script to deploy vercel preview with db env vars in script that can trigger from dev or cli
+6. implement ci logic to clean up branch on deletion
+7. implement logic to merge branch schema on merge
+
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  Db-Branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
+        id: extract_branch
+      - name: Create a branch
+        uses: planetscale/create-branch-action@v1
+        id: create_branch
+        with:
+          org_name: kevin-mind
+          database_name: remix_purple_stack_production
+          branch_name: ${{ steps.extract_branch.outputs.branch }}
+          from: main
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+      - name: Create a password
+        uses: planetscale/create-branch-password-action@v1
+        id: create_branch_password
+        with:
+          org_name: kevin-mind
+          database_name: remix_purple_stack_production
+          branch_name: ${{ steps.extract_branch.outputs.branch }}
+          name: 'pass_${{ steps.extract_branch.outputs.branch }}'
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+          PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
+      - name: Get the new credentials
+        run: |
+          echo "Hostname: ${{ steps.create_password.outputs.hostname }}"
+          echo "Username: ${{ steps.create_password.outputs.username }}"
+          echo "Password: ${{ steps.create_password.outputs.password }}"
+  # What we want is to always deploy, and we can set --env to the deployment to always have the ps variables for that branch
+  # what we need to do is modify the db-branch job to either create or read the db info so we can set the appropriate DATABASE_URL on the deployment
+  # We also need to trigger migrations on the deployment.
+  Deploy-Preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
