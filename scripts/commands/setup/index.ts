@@ -1,6 +1,7 @@
-import { $, fs } from "zx";
+import { question, $, fs } from "zx";
 import { step, pkgJson, log, projectRootPath } from "../../utils";
 import { join } from "path";
+import choice from "cli-select";
 import invariant from "tiny-invariant";
 
 import {
@@ -10,6 +11,7 @@ import {
   getTokenFromPaste,
   syncToGithub,
 } from "../../env";
+import { pscaleExec } from "../../services/pscale";
 
 await step(
   "login to github",
@@ -106,3 +108,68 @@ await step(
     spinner: false,
   }
 );
+
+await step(
+  "login to planetscale",
+  async () => {
+    const planetscaleToken = await getOrSetAccessToken(
+      EnvKeys.PlanetScale,
+      getTokenFromPaste(
+        "https://app.planetscale.com/kevin-mind/settings/service-tokens"
+      ),
+      syncToGithub
+    );
+
+    const planetScaleTokenId = await getOrSetAccessToken(
+      EnvKeys.PlanetScaleTokenId,
+      async () => question("paste your access token id here:   "),
+      syncToGithub
+    );
+
+    await getOrSetAccessToken(
+      EnvKeys.PlanetScaleOrg,
+      async () => {
+        log("select a github organization to associate planetscale with");
+        const orgs = JSON.parse(
+          (
+            await pscaleExec(
+              "org list --format json",
+              planetscaleToken.token,
+              planetScaleTokenId.token
+            )
+          ).toString()
+        ) as { name: string }[];
+
+        const selectedOrg = await choice<string>({
+          values: orgs.map((org) => org.name),
+        });
+
+        return selectedOrg.value;
+      },
+      syncToGithub
+    );
+
+    await getOrSetAccessToken(
+      EnvKeys.PlanetScaleDatabase,
+      async () => {
+        return pkgJson.name;
+      },
+      syncToGithub
+    );
+  },
+  {
+    spinner: false,
+  }
+);
+
+await step("prisma generate", async () => {
+  await $`pnpm exec prisma generate`;
+});
+
+await step("prisma migrate", async () => {
+  await $`pnpm exec prisma db push`;
+});
+
+await step("db seed", async () => {
+  await $`pnpm exec prisma db seed`;
+});
