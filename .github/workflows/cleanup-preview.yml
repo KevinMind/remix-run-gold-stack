@@ -1,4 +1,4 @@
-name: 🚀 Deploy (preview)
+name: 🚀 Cleanup (preview)
 env:
   PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
   PLANETSCALE_ORG: ${{ secrets.PLANETSCALE_ORG }}
