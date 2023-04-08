@@ -45,7 +45,7 @@ tasks:
     command: |
       gp ports await 3306
       pnpm run script setup
-      pnpm run build
+      pnpm run script build
       pnpm run dev
 
 vscode:
