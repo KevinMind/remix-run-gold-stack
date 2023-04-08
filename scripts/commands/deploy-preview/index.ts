@@ -1,9 +1,10 @@
-import { $, ProcessOutput } from "zx";
+import { $, ProcessOutput, fs } from "zx";
 import invariant from "tiny-invariant";
 
-import { step, pkgJson } from "../../utils";
+import { step, pkgJson, projectRootPath } from "../../utils";
 import { env } from "../../env";
 import { log } from "console";
+import { join } from "path";
 
 const dbName = pkgJson.name;
 
@@ -33,10 +34,6 @@ await step("validate env", async () => {
 const branch = await $`git rev-parse --abbrev-ref HEAD`;
 
 $.verbose = true;
-
-// await step('deleting branch', async () => {
-//   await $`pscale branch delete ${dbName} ${branch} --force`;
-// });
 
 await step("deploy db branch", async () => {
   try {
@@ -99,7 +96,17 @@ const connectionString = await step<string>(
 );
 
 await step("deploy preview", async () => {
-  log(`project: ${vercelProjectId} org: ${vercelOrgId}`);
+  const dbUrlPath = join(projectRootPath, "db_url.txt");
+
+  log(`deploying project: ${vercelProjectId} org: ${vercelOrgId}`);
+  $.verbose = true;
+
   await $`vercel pull --yes --environment=preview -t ${vercelToken} --scope ${vercelOrgId}`;
+
+  await fs.writeFileSync(dbUrlPath, connectionString, "utf-8");
+
+  await $`vercel env rm DATABASE_URL preview ${branch} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
+  await $`vercel env add DATABASE_URL preview ${branch} < ${dbUrlPath} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
   await $`vercel deploy -t ${vercelToken} --scope ${vercelOrgId} -e DATABASE_URL=${connectionString}`;
+  log("deploy successful!");
 });

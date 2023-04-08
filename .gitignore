@@ -12,3 +12,4 @@ node_modules
 /tmp
 /mysql-data/
 
+db_url.txt
