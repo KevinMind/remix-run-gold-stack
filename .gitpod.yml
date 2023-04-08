@@ -37,9 +37,14 @@ tasks:
         fi
       fi
 
+  - name: Docker
+    init: docker-compose pull
+    command: docker-compose up
+
   - init: pnpm install
     command: |
-      pnpm run setup
+      gp ports await 3306
+      pnpm run script setup
       pnpm run build
       pnpm run dev
 
