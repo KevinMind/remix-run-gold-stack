@@ -25,5 +25,5 @@ jobs:
         run: pnpm add --global vercel
       - name: Install Pscale CLI
         run: brew install planetscale/tap/pscale
-      - name: Deploy preview
+      - name: Deploy production
         run: pnpm run script deploy-production

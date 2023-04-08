@@ -11,9 +11,9 @@ let pscaleServiceTokenId: string;
 let pscaleOrg: string;
 
 await step("validate env", async () => {
-  invariant(env.PLANETSCALE_ORG);
-  invariant(env.PLANETSCALE_SERVICE_TOKEN);
-  invariant(env.PLANETSCALE_SERVICE_TOKEN_ID);
+  invariant(env.PLANETSCALE_ORG, 'PLANETSCALE_ORG is requires');
+  invariant(env.PLANETSCALE_SERVICE_TOKEN, 'PLANETSCALE_SERVICE_TOKEN is requires');
+  invariant(env.PLANETSCALE_SERVICE_TOKEN_ID, 'PLANETSCALE_SERVICE_TOKEN_ID is requires');
 
   pscaleServiceToken = env.PLANETSCALE_SERVICE_TOKEN;
   pscaleServiceTokenId = env.PLANETSCALE_SERVICE_TOKEN_ID;
