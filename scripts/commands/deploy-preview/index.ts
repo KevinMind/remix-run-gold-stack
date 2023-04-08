@@ -105,7 +105,10 @@ await step("deploy preview", async () => {
 
   await fs.writeFileSync(dbUrlPath, connectionString, "utf-8");
 
-  await $`vercel env rm DATABASE_URL preview ${branch} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
+  try {
+    await $`vercel env rm DATABASE_URL preview ${branch} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
+  } catch {}
+  
   await $`vercel env add DATABASE_URL preview ${branch} < ${dbUrlPath} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
   await $`vercel deploy -t ${vercelToken} --scope ${vercelOrgId} -e DATABASE_URL=${connectionString}`;
   log("deploy successful!");
