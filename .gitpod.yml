@@ -39,6 +39,7 @@ tasks:
 
   - init: pnpm install
     command: |
+      pnpm run setup
       pnpm run build
       pnpm run dev
 
