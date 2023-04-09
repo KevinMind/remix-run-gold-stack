@@ -90,17 +90,23 @@ await step(
       return loadFromVercelProject();
     }
 
-    const project = await loadFromVercelProject();
-
     await getOrSetAccessToken(
       EnvKeys.VercelProjectId,
-      async () => project.projectId,
+      async () => {
+        const project = await loadFromVercelProject();
+
+        return project.projectId;
+      },
       syncToGithub
     );
 
     await getOrSetAccessToken(
       EnvKeys.VercelOrgId,
-      async () => project.orgId,
+      async () => {
+        const project = await loadFromVercelProject();
+
+        return project.orgId;
+      },
       syncToGithub
     );
   },
