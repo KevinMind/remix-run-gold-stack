@@ -13,14 +13,14 @@ const pscaleOrg = secrets.readSecret(SecretKeys.PlanetScaleOrg);
 const vercelToken = secrets.readSecret(SecretKeys.Vercel);
 const vercelOrgId = secrets.readSecret(SecretKeys.VercelOrgId);
 
-const branch = await $`git rev-parse --abbrev-ref HEAD`;
+const branch = (await $`git rev-parse --abbrev-ref HEAD`).toString().trim();
 
-const environment = branch.toString() === 'main' ? 'production' : 'preview';
+const environment = branch !== 'main' ? 'preview' : 'production';
 
 const isProd = environment === 'production';
 const isPreview = environment === 'preview';
 
-$.verbose = true;
+$.verbose = false;
 
 isPreview && await step("deploy db branch", async () => {
   try {
@@ -88,14 +88,17 @@ await step(`deploy ${environment}`, async () => {
 
   await $`vercel pull --yes --environment=${environment} -t ${vercelToken} --scope ${vercelOrgId}`;
 
+  const DATABASE_URL = 'DATABASE_URL';
+
   await withTmpPath(connectionString, async (dbUrlPath) => {
     try {
-      await $`vercel env rm DATABASE_URL ${environment} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
+      await $`vercel env rm ${DATABASE_URL} ${environment} ${branch} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
     } catch {}
 
-    await $`vercel env add DATABASE_URL ${environment} < ${dbUrlPath} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
+    await $`vercel env add ${DATABASE_URL} ${environment} ${branch} < ${dbUrlPath} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
   });
 
-  await $`vercel deploy -t ${vercelToken} --scope ${vercelOrgId} -e DATABASE_URL=${connectionString} ${isProd ? '--prod' : ''}`;
+  $.verbose = true;
+  await $`vercel deploy -t ${vercelToken} --scope ${vercelOrgId} -e ${DATABASE_URL}=${connectionString} ${isProd ? '--prod' : ''}`;
   log("deploy successful!");
 });
