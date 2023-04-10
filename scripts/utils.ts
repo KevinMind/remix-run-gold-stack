@@ -75,7 +75,7 @@ export async function withTmpPath(
   value: string,
   cb: (tmpPath: string) => Promise<void>
 ) {
-  const tmpDir = join(projectRootPath, 'tmp');
+  const tmpDir = join(projectRootPath, "tmp");
   const tmpPath = join(tmpDir, `tmp-${Math.random() * 1_000}.secret`);
 
   if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir);
@@ -83,8 +83,9 @@ export async function withTmpPath(
 
   try {
     await cb(tmpPath);
+  } catch (error) {
+    throw error;
   } finally {
     fs.removeSync(tmpPath);
   }
 }
-

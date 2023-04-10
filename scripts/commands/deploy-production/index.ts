@@ -1,7 +1,6 @@
-import { $, fs } from "zx";
+import { $ } from "zx";
 
-import { step, log, pkgJson, projectRootPath, withTmpPath } from "../../utils";
-import { join } from "path";
+import { step, log, pkgJson, withTmpPath } from "../../utils";
 import { SecretsManager, SecretKeys } from "../../secrets";
 
 const dbName = pkgJson.name;
@@ -70,7 +69,7 @@ await step("deploy production", async () => {
     try {
       await $`vercel env rm DATABASE_URL production -t ${vercelToken} --scope ${vercelOrgId} --yes`;
     } catch {}
-  
+
     await $`vercel env add DATABASE_URL production < ${dbUrlPath} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
   });
 

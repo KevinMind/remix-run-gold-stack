@@ -4,24 +4,22 @@ import {
   createDecipheriv,
   scryptSync,
 } from "crypto";
-import { fs, os } from "zx";
+import { fs } from "zx";
 import { join } from "path";
-import { config } from "dotenv";
 import { logImportant, projectRootPath } from "./utils";
 
 export class SecretsManager {
   private readonly directory: string;
   private readonly key: Buffer;
 
-  constructor() {
+  constructor(password = secretPassword()) {
     this.directory = join(projectRootPath, "secrets");
 
     if (!fs.existsSync(this.directory)) {
       fs.mkdirSync(this.directory);
     }
 
-    const password = Buffer.from(this.getPassword(), "base64");
-    this.key = scryptSync(password, "salt", 32); // Use 'salt' as a fixed salt for simplicity; consider using a random salt in a real-world application
+    this.key = scryptSync(Buffer.from(password, "base64"), "salt", 32);
   }
 
   writeSecret(key: SecretKeys, value: string): void {
@@ -72,32 +70,13 @@ export class SecretsManager {
     return value;
   }
 
-  getPassword() {
-    const dotEnvPath = join(projectRootPath, ".env");
-
-    const env = config({
-      path: dotEnvPath,
-    }).parsed!;
-
-    const secret = process.env[SECRET_PASSWORD] || env[SECRET_PASSWORD];
-
-    if (secret?.length) {
-      return secret;
-    }
-
-    const newSecret = randomBytes(32).toString("base64");
-
-    fs.writeFileSync(
-      dotEnvPath,
-      Object.entries({ ...env, [SECRET_PASSWORD]: newSecret })
-        .map(([key, value]) => `${key}=${value}`)
-        .join(os.EOL)
-    );
+  public static createPassword() {
+    const password = randomBytes(32).toString("base64");
 
     logImportant(
-      `your secret is '${newSecret}'. Saving to .env file as ${SECRET_PASSWORD}. Make sure to keep track of this value.`
+      `your secret is '${password}'. Save this to environment variable '${SECRET_PASSWORD}'. Make sure to keep track of this value.`
     );
-    return newSecret;
+    return password;
   }
 
   private getFilePath(key: string): string {
@@ -106,6 +85,17 @@ export class SecretsManager {
 }
 
 export const SECRET_PASSWORD = "SECRET_PASSWORD";
+
+export const secretPassword = () => {
+  const password = process.env[SECRET_PASSWORD];
+
+  if (!password)
+    throw new Error(
+      `password missing in environment variables. make sure it is set at '${SECRET_PASSWORD}' in your environment`
+    );
+
+  return password;
+};
 
 export enum SecretKeys {
   Github = "GITHUB_ACCESS_TOKEN",
