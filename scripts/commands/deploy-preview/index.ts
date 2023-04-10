@@ -1,8 +1,7 @@
 import { $, ProcessOutput } from "zx";
 
-import { step, pkgJson, withTmpPath } from "../../utils";
+import { step, pkgJson, withTmpPath, log } from "../../utils";
 import { SecretKeys, SecretsManager } from "../../secrets";
-import { log } from "console";
 
 const dbName = pkgJson.name;
 

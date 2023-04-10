@@ -21,4 +21,4 @@ jobs:
       - name: Install Pscale CLI
         run: brew install planetscale/tap/pscale
       - name: Deploy production
-        run: pnpm run script deploy-production
+        run: pnpm run script deploy
