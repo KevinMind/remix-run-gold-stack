@@ -92,10 +92,10 @@ await step(`deploy ${environment}`, async () => {
 
   await withTmpPath(connectionString, async (dbUrlPath) => {
     try {
-      await $`vercel env rm ${DATABASE_URL} ${environment} ${branch} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
+      await $`vercel env rm ${DATABASE_URL} ${environment} ${isPreview ? branch : ''} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
     } catch {}
 
-    await $`vercel env add ${DATABASE_URL} ${environment} ${branch} < ${dbUrlPath} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
+    await $`vercel env add ${DATABASE_URL} ${environment} ${isPreview ? branch : ''} < ${dbUrlPath} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
   });
 
   $.verbose = true;
