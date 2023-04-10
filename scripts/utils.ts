@@ -71,16 +71,20 @@ export async function step<T = never>(
   return result;
 }
 
-export async function open(url: string) {
-  $`
-  if [ -n $BROWSER ]; then
-    $BROWSER '${url}'
-  elif which xdg-open > /dev/null; then
-    xdg-open '${url}'
-  elif which gnome-open > /dev/null; then
-    gnome-open '${url}'
-  else
-  echo "Failed to open '${url}'."
-fi
-  `;
+export async function withTmpPath(
+  value: string,
+  cb: (tmpPath: string) => Promise<void>
+) {
+  const tmpDir = join(projectRootPath, 'tmp');
+  const tmpPath = join(tmpDir, `tmp-${Math.random() * 1_000}.secret`);
+
+  if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir);
+  fs.writeFileSync(tmpPath, value);
+
+  try {
+    await cb(tmpPath);
+  } finally {
+    fs.removeSync(tmpPath);
+  }
 }
+

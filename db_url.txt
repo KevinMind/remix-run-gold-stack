@@ -1,0 +1,1 @@
+mysql://xugfhsvrf9gb27vhu3gn:pscale_pw_wkpKIx4FLomeomwGyTv3Jgdd4K6lTEodVACTse5vqJ8@aws.connect.psdb.cloud/remix-purple-stack?sslaccept=strict
