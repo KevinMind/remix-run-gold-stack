@@ -66,7 +66,7 @@ export async function step<T = never>(
 ) {
   logStep(`step: ${name}`);
 
-  const result = options.spinner ? await spinner(async () => cb()) : await cb();
+  const result = options.spinner && !process.env.CI ? await spinner(async () => cb()) : await cb();
 
   return result;
 }
