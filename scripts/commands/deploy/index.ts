@@ -12,11 +12,10 @@ const pscaleServiceTokenId = secrets.readSecret(SecretKeys.PlanetScaleTokenId);
 const pscaleOrg = secrets.readSecret(SecretKeys.PlanetScaleOrg);
 const vercelToken = secrets.readSecret(SecretKeys.Vercel);
 const vercelOrgId = secrets.readSecret(SecretKeys.VercelOrgId);
-const vercelProjectId = secrets.readSecret(SecretKeys.VercelProjectId);
 
-const branch = (await $`git rev-parse --abbrev-ref HEAD`).toString();
+const branch = await $`git rev-parse --abbrev-ref HEAD`;
 
-const environment = branch === 'main' ? 'production' : 'preview';
+const environment = branch.toString() === 'main' ? 'production' : 'preview';
 
 const isProd = environment === 'production';
 const isPreview = environment === 'preview';
