@@ -41,7 +41,8 @@ tasks:
     init: docker-compose pull
     command: docker-compose up
 
-  - init: pnpm install
+  - name: Run
+    init: pnpm install
     command: |
       gp ports await 3306
       pnpm run script setup

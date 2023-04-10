@@ -1,17 +1,17 @@
-name: 🚀 Cleanup (preview)
+name: 🚀 Deploy
 env:
   SECRET_PASSWORD: ${{ secrets.SECRET_PASSWORD }}
 
-on:
-  pull_request:
-    types: [closed]
+on: [push]
 
 permissions:
+  actions: write
+  contents: read
   packages: read
 
 jobs:
-  Cleanup-Preview:
-    runs-on: macos-latest
+  Deploy:
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/kevin-mind/remix-run-purple-stack:docker-ci
       options: --user root
@@ -22,5 +22,5 @@ jobs:
         with:
           version: 7
           run_install: true
-      - name: Deploy preview
-        run: pnpm run script cleanup-preview ${{ github.head_ref }}
+      - name: Deploy
+        run: pnpm run script deploy

@@ -7,9 +7,13 @@ on:
 permissions:
   actions: write
   contents: read
+  packages: read
 
 jobs:
   typecheck:
+    container:
+      image: ghcr.io/kevin-mind/remix-run-purple-stack:docker-ci
+      options: --user root
     name: ʦ TypeScript
     runs-on: ubuntu-latest
     steps:
