@@ -12,7 +12,12 @@ import choice from "cli-select";
 import invariant from "tiny-invariant";
 
 import { pscaleExec } from "../../services/pscale";
-import { SecretsManager, SecretKeys, SECRET_PASSWORD } from "../../secrets";
+import {
+  SecretsManager,
+  SecretKeys,
+  SECRET_PASSWORD,
+  secretPassword,
+} from "../../secrets";
 
 function getTokenFromPaste(url: string) {
   return async () => {
@@ -23,9 +28,21 @@ function getTokenFromPaste(url: string) {
   };
 }
 
-const secrets = new SecretsManager();
+const password = await step("get password", async () => {
+  const secret = secretPassword();
 
-const secretPassword = secrets.getPassword();
+  if (secret?.length) {
+    return secret;
+  }
+
+  const newSecret = SecretsManager.createPassword();
+
+  await $`eval $(gp env -e ${SECRET_PASSWORD}="${newSecret}")`;
+
+  return newSecret;
+});
+
+const secrets = new SecretsManager(password);
 
 await step(
   "login to github",
@@ -51,7 +68,7 @@ await step(
 
 await step("save secret to github", async () => {
   $.verbose = false;
-  await $`gh secret set ${SECRET_PASSWORD} -b ${secretPassword}`;
+  await $`gh secret set ${SECRET_PASSWORD} -b ${password}`;
 });
 
 const vercelToken = await step(
@@ -142,7 +159,7 @@ const { orgId } = await step(
 );
 
 await step("saving secret to vercel", async () => {
-  await withTmpPath(secretPassword, async (tmpSecretPath) => {
+  await withTmpPath(password, async (tmpSecretPath) => {
     $.verbose = false;
     for await (let environment of ["production", "preview", "development"]) {
       const existing = (

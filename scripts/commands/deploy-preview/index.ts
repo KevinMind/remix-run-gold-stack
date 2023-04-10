@@ -21,15 +21,16 @@ $.verbose = true;
 
 await step("deploy db branch", async () => {
   try {
-    await $`pscale branch show ${dbName} ${branch} --format json --service-token ${pscaleServiceToken} --service-token-id ${pscaleServiceTokenId}`;
+    await $`pscale branch show ${dbName} ${branch} --format json --service-token ${pscaleServiceToken} --service-token-id ${pscaleServiceTokenId} --org ${pscaleOrg}`;
     log(`found branch ${branch}`);
   } catch (error) {
-    if (error instanceof ProcessOutput) {
-      if (error.stderr.includes("does not exist in database")) {
-        await step("creating branch", async () => {
-          return await $`pscale branch create ${dbName} ${branch} --service-token ${pscaleServiceToken} --service-token-id ${pscaleServiceTokenId} --wait`;
-        });
-      }
+    if (
+      error instanceof ProcessOutput &&
+      error.stderr.includes("does not exist in database")
+    ) {
+      await step("creating branch", async () => {
+        return await $`pscale branch create ${dbName} ${branch} --service-token ${pscaleServiceToken} --service-token-id ${pscaleServiceTokenId} --org ${pscaleOrg} --wait`;
+      });
     } else {
       throw error;
     }
@@ -80,7 +81,6 @@ const connectionString = await step<string>(
 );
 
 await step("deploy preview", async () => {
-
   log(`deploying project: ${vercelProjectId} org: ${vercelOrgId}`);
   $.verbose = true;
 
@@ -90,7 +90,7 @@ await step("deploy preview", async () => {
     try {
       await $`vercel env rm DATABASE_URL preview ${branch} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
     } catch {}
-  
+
     await $`vercel env add DATABASE_URL preview ${branch} < ${dbUrlPath} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
   });
 
