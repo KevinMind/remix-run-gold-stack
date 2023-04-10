@@ -1,8 +1,6 @@
 name: 🚀 Cleanup (preview)
 env:
-  PLANETSCALE_SERVICE_TOKEN: ${{ secrets.PLANETSCALE_SERVICE_TOKEN }}
-  PLANETSCALE_ORG: ${{ secrets.PLANETSCALE_ORG }}
-  PLANETSCALE_SERVICE_TOKEN_ID: ${{ secrets.PLANETSCALE_SERVICE_TOKEN_ID }}
+  SECRET_PASSWORD: ${{ secrets.SECRET_PASSWORD }}
 
 on:
   pull_request:

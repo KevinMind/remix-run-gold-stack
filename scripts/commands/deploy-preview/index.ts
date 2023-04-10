@@ -1,35 +1,19 @@
-import { $, ProcessOutput, fs } from "zx";
-import invariant from "tiny-invariant";
+import { $, ProcessOutput } from "zx";
 
-import { step, pkgJson, projectRootPath } from "../../utils";
-import { env } from "../../env";
+import { step, pkgJson, withTmpPath } from "../../utils";
+import { SecretKeys, SecretsManager } from "../../secrets";
 import { log } from "console";
-import { join } from "path";
 
 const dbName = pkgJson.name;
 
-let pscaleServiceToken: string;
-let pscaleServiceTokenId: string;
-let pscaleOrg: string;
-let vercelToken: string;
-let vercelOrgId: string;
-let vercelProjectId: string;
+const secrets = new SecretsManager();
 
-await step("validate env", async () => {
-  invariant(env.PLANETSCALE_ORG);
-  invariant(env.PLANETSCALE_SERVICE_TOKEN);
-  invariant(env.PLANETSCALE_SERVICE_TOKEN_ID);
-  invariant(env.VERCEL_ACCESS_TOKEN);
-  invariant(env.VERCEL_ORG_ID);
-  invariant(env.VERCEL_PROJECT_ID);
-
-  vercelOrgId = env.VERCEL_ORG_ID;
-  vercelProjectId = env.VERCEL_PROJECT_ID;
-  vercelToken = env.VERCEL_ACCESS_TOKEN;
-  pscaleServiceToken = env.PLANETSCALE_SERVICE_TOKEN;
-  pscaleServiceTokenId = env.PLANETSCALE_SERVICE_TOKEN_ID;
-  pscaleOrg = env.PLANETSCALE_ORG;
-});
+const pscaleServiceToken = secrets.readSecret(SecretKeys.PlanetScale);
+const pscaleServiceTokenId = secrets.readSecret(SecretKeys.PlanetScaleTokenId);
+const pscaleOrg = secrets.readSecret(SecretKeys.PlanetScaleOrg);
+const vercelToken = secrets.readSecret(SecretKeys.Vercel);
+const vercelOrgId = secrets.readSecret(SecretKeys.VercelOrgId);
+const vercelProjectId = secrets.readSecret(SecretKeys.VercelProjectId);
 
 const branch = await $`git rev-parse --abbrev-ref HEAD`;
 
@@ -96,20 +80,20 @@ const connectionString = await step<string>(
 );
 
 await step("deploy preview", async () => {
-  const dbUrlPath = join(projectRootPath, "db_url.txt");
 
   log(`deploying project: ${vercelProjectId} org: ${vercelOrgId}`);
   $.verbose = true;
 
   await $`vercel pull --yes --environment=preview -t ${vercelToken} --scope ${vercelOrgId}`;
 
-  await fs.writeFileSync(dbUrlPath, connectionString, "utf-8");
-
-  try {
-    await $`vercel env rm DATABASE_URL preview ${branch} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
-  } catch {}
+  await withTmpPath(connectionString, async (dbUrlPath) => {
+    try {
+      await $`vercel env rm DATABASE_URL preview ${branch} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
+    } catch {}
   
-  await $`vercel env add DATABASE_URL preview ${branch} < ${dbUrlPath} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
+    await $`vercel env add DATABASE_URL preview ${branch} < ${dbUrlPath} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
+  });
+
   await $`vercel deploy -t ${vercelToken} --scope ${vercelOrgId} -e DATABASE_URL=${connectionString}`;
   log("deploy successful!");
 });

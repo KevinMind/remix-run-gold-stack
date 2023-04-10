@@ -1,34 +1,19 @@
 import { $, fs } from "zx";
-import invariant from "tiny-invariant";
 
-import { step, log, pkgJson, projectRootPath } from "../../utils";
-import { env } from "../../env";
+import { step, log, pkgJson, projectRootPath, withTmpPath } from "../../utils";
 import { join } from "path";
+import { SecretsManager, SecretKeys } from "../../secrets";
 
 const dbName = pkgJson.name;
 
-let pscaleServiceToken: string;
-let pscaleServiceTokenId: string;
-let pscaleOrg: string;
-let vercelToken: string;
-let vercelOrgId: string;
-let vercelProjectId: string;
+const secrets = new SecretsManager();
 
-await step("validate env", async () => {
-  invariant(env.PLANETSCALE_ORG);
-  invariant(env.PLANETSCALE_SERVICE_TOKEN);
-  invariant(env.PLANETSCALE_SERVICE_TOKEN_ID);
-  invariant(env.VERCEL_ACCESS_TOKEN);
-  invariant(env.VERCEL_ORG_ID);
-  invariant(env.VERCEL_PROJECT_ID);
-
-  vercelOrgId = env.VERCEL_ORG_ID;
-  vercelProjectId = env.VERCEL_PROJECT_ID;
-  vercelToken = env.VERCEL_ACCESS_TOKEN;
-  pscaleServiceToken = env.PLANETSCALE_SERVICE_TOKEN;
-  pscaleServiceTokenId = env.PLANETSCALE_SERVICE_TOKEN_ID;
-  pscaleOrg = env.PLANETSCALE_ORG;
-});
+const pscaleServiceToken = secrets.readSecret(SecretKeys.PlanetScale);
+const pscaleServiceTokenId = secrets.readSecret(SecretKeys.PlanetScaleTokenId);
+const pscaleOrg = secrets.readSecret(SecretKeys.PlanetScaleOrg);
+const vercelToken = secrets.readSecret(SecretKeys.Vercel);
+const vercelOrgId = secrets.readSecret(SecretKeys.VercelOrgId);
+const vercelProjectId = secrets.readSecret(SecretKeys.VercelProjectId);
 
 $.verbose = true;
 
@@ -76,21 +61,19 @@ const connectionString = await step<string>(
 );
 
 await step("deploy production", async () => {
-
-  const dbUrlPath = join(projectRootPath, "db_url.txt");
-
   log(`deploying project: ${vercelProjectId} org: ${vercelOrgId}`);
   $.verbose = true;
 
   await $`vercel pull --yes --environment=production -t ${vercelToken} --scope ${vercelOrgId}`;
 
-  await fs.writeFileSync(dbUrlPath, connectionString, "utf-8");
+  await withTmpPath(connectionString, async (dbUrlPath) => {
+    try {
+      await $`vercel env rm DATABASE_URL production -t ${vercelToken} --scope ${vercelOrgId} --yes`;
+    } catch {}
+  
+    await $`vercel env add DATABASE_URL production < ${dbUrlPath} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
+  });
 
-  try {
-    await $`vercel env rm DATABASE_URL production -t ${vercelToken} --scope ${vercelOrgId} --yes`;
-  } catch {}
-
-  await $`vercel env add DATABASE_URL production < ${dbUrlPath} -t ${vercelToken} --scope ${vercelOrgId} --yes`;
   await $`vercel deploy -t ${vercelToken} --scope ${vercelOrgId} -e DATABASE_URL=${connectionString} --prod`;
   log("deploy successful!");
 });
